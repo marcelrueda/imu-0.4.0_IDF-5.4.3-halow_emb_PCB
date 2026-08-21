@@ -34,15 +34,13 @@ SPI_CS5     SD_CS                      4
 **************************************************************************
 MISC  (IO general)
 -------------------------
-SW1                                    EN
-SW2  (boot)                            0
-BTN                                    18
+SW1 (botón páginas display, firmware SW1_GPIO)   18
+SW2 (boot)                                        0
+RESET                                            EN
 LEDG (run)                             14
 SD_DET                                 48
 LTC2954_KILL                           16
 LTC2954_INT                            17
-
-
 
 
 

@@ -13,7 +13,7 @@ extern "C"
 
 #define LED_GPIO 14     // GPIO para el LED de estado, Led Verde
 #define RGB_GPIO 33     // GPIO para el LED RGB, Led RGB
-#define SW1_GPIO 0      // 18     // GPIO para el botón SW1
+#define SW1_GPIO 18     // GPIO para el botón SW1 (cableado físico del PCB Beta 3)
 #define MM_RESET_GPIO 7 // GPIO conectado a MM_RESET_N
 
     extern volatile uint8_t currentPage;

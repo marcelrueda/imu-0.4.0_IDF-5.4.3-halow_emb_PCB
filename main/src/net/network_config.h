@@ -9,10 +9,12 @@
 // ---------------------------------------------------------
 // Configuración del Broker MQTT
 // ---------------------------------------------------------
-#define MQTT_BROKER "mqtt://190.144.89.234"
-#define MQTT_PORT 1883
-#define MQTT_USERNAME "pruebas"
-#define MQTT_PASSWORD "pruebas123"
+// Configuración del Broker MQTT (EMQX Cloud, TLS)
+#define MQTT_BROKER   "mqtts://x1dc1a12.ala.us-east-1.emqxsl.com"
+#define MQTT_PORT     8883
+#define MQTT_USERNAME "R2MyClient"
+#define MQTT_PASSWORD "TU_CONTRASEÑA_VIGENTE"
+#define MQTT_TELEMETRY_TOPIC "imu/esp32/rs20003BELO/telemetry"
 
 // ---------------------------------------------------------
 // Configuración del Cliente HTTP

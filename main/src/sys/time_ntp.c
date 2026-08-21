@@ -122,7 +122,7 @@ static int get_utc_time_from_server(const char *server_ip, time_t *out_timestamp
 }
 
 // Actualizar hora UTC del sistema
-static bool update_system_utc_time()
+bool update_system_utc_time()
 {
     time_t timestamp = 0;
     bool success = false;

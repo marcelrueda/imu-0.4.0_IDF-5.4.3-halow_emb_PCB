@@ -9,6 +9,7 @@
 
 #include "esp_event.h"
 #include "esp_log.h"
+#include "esp_crt_bundle.h"
 #include "cJSON.h"
 #include "common/utils.h"
 
@@ -88,6 +89,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     {
     case MQTT_EVENT_CONNECTED:
         mqtt_connected = true;
+        esp_mqtt_client_publish(event->client, "imu/status", "online", 0, 0, 0);
         ESP_LOGI(TAG, "MQTT conectado");
         break;
 
@@ -110,11 +112,20 @@ void mqtt_app_start(struct device *dev)
 {
     get_mqtt_topic(topic, sizeof(topic));
 
-    esp_mqtt_client_config_t mqtt_cfg = {
+        esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = MQTT_BROKER,
         .broker.address.port = MQTT_PORT,
+        .broker.verification.crt_bundle_attach = esp_crt_bundle_attach,
         .credentials.username = MQTT_USERNAME,
         .credentials.authentication.password = MQTT_PASSWORD,
+        .session.last_will = {
+            .topic  = "imu/lastwill",
+            .msg    = "offline",
+            .qos    = 0,
+            .retain = 0,
+        },
+        .session.keepalive = 60,
+        .buffer.out_size = 8192,
     };
 
     dev->client = esp_mqtt_client_init(&mqtt_cfg);

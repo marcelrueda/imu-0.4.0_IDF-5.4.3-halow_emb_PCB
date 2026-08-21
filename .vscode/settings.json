@@ -1,7 +1,7 @@
 {
   "idf.currentSetup": "C:\\esp\\v5.4.4\\esp-idf",
   "idf.flashType": "UART",
-  "idf.portWin": "COM5",
+  "idf.portWin": "COM7",
   "idf.customExtraVars": {},
   "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
   "clangd.arguments": [

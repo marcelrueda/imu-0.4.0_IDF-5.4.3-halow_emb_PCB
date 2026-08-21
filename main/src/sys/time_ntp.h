@@ -15,4 +15,6 @@ void print_country_time(const char *country);
 
 // Actualiza la hora del sistema desde un servidor NTP
 void time_sync_task(void *pvParameters);
+// Sincroniza la hora UTC del sistema de forma bloqueante (retorna true si OK)
+bool update_system_utc_time(void);
 #endif // TIME_NTP_H

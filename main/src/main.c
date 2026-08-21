@@ -219,8 +219,21 @@ static void state_machine_task(void *pvParameters)
     }
     // Estado de configuración
     case STATE_SETUP:
-      display_show_loading(70);  // 70%
-      appNetworkInit();          // Selección de red
+      display_show_loading(70); // 70%
+      appNetworkInit();         // Selección de red
+
+      bool ntp_ok = false;
+      for (int i = 0; i < 5 && !ntp_ok; i++)
+      {
+        ntp_ok = update_system_utc_time();
+        if (!ntp_ok) vTaskDelay(pdMS_TO_TICKS(1000));
+      }
+      if (!ntp_ok)
+      {
+        current_state = STATE_ERROR;
+        break;
+      }
+
       display_show_loading(80);  // 80%
       app_IMU();                 // Inicializa IMU
       display_show_loading(90);  // 90%
