@@ -3,7 +3,7 @@
 #include "common/utils.h"               // Utilidades varias
 #include "imu/data_sensor.h"            // Datos del sensor
 #include "imu/imu.h"                    // IMU
-#include "net/network_http_client.h"    // Cliente HTTP
+
 #include "net/network_mqtt.h"           // MQTT
 #include "net/network_selector.h"       // Selector de red
 #include "peripherals/device_display.h" // Pantalla OLED
@@ -47,7 +47,7 @@ static system_state_t current_state = STATE_INIT;
 // Inicializa periféricos
 static void init_peripherals(void)
 {
-  sensor_memory_init();    // Inicializa memoria para buffers en PSRAM
+  
   morse_reset_init();      // Inicializa pin de reset físico morse halow
   spi_bus_init(SPI3_HOST); // Inicializa bus SPI
 
@@ -78,14 +78,11 @@ static bool init_queues(void)
 {
   signal_queue_task = xQueueCreate(10, sizeof(data_signal_t));
   collection_signal_queue = xQueueCreate(10, sizeof(data_signal_t));
-  compression_signal_queue = xQueueCreate(10, sizeof(data_signal_t));
-  http_signal_queue = xQueueCreate(10, sizeof(data_signal_t));
   signal_queue_state = xQueueCreate(10, sizeof(data_signal_t));
   mqtt_live_queue = xQueueCreate(10, sizeof(data_imu_t));
 
-  bool ok = signal_queue_task && collection_signal_queue &&
-            compression_signal_queue && http_signal_queue &&
-            signal_queue_state && mqtt_live_queue;
+ bool ok = signal_queue_task && collection_signal_queue &&
+          signal_queue_state && mqtt_live_queue;
 
   if (ok)
     ESP_LOGI(TAG, "Colas de señal creadas correctamente");
@@ -102,7 +99,7 @@ static bool create_app_tasks(void)
   // ok &= start_system_metrics_task(); // Métricas del sistema
 
   // Tareas no críticas (Prioridad 2 o 1)
-  ok &= create_task(http_send_task, "http_send_task", 4096, NULL, 2, NULL, 0); // BAJA
+  
   ok &= create_task(time_sync_task, "time_sync_task", 4096, NULL, 1, NULL, 0); // BAJA
 
   // Tareas con prioridad normal (Prioridad 3)
@@ -110,7 +107,7 @@ static bool create_app_tasks(void)
   ok &= create_task(display_task, "display_task", 6144, NULL, 3, NULL, 0);     // NORMAL
 
   // Tareas críticas (Prioridad 5 y 6)
-  ok &= create_task(data_compression_task, "data_compression_task", 8192, NULL, 5, &gzip_task_handle, 0); // ALTA
+ 
   ok &= create_task(data_collection_task, "data_collection_task", 8192, NULL, 6, NULL, 1);                // CRÍTICA
 
   if (ok == pdPASS)
@@ -266,9 +263,10 @@ static void state_machine_task(void *pvParameters)
 }
 
 // ---------------- app_main ----------------
+// ---------------- app_main ----------------
 void app_main(void)
 {
-  init_peripherals();
+  init_peripherals();   // <-- esta línea es la que debes verificar que sigue ahí
 
   BaseType_t res1 = create_task(state_machine_task, "state_machine_task", 8192, NULL, 5, NULL, 1);
 

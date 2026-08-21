@@ -10,75 +10,19 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_crt_bundle.h"
-#include "cJSON.h"
 #include "common/utils.h"
+#include "esp_timer.h"
+
+#define BATCH_N       10
+#define SAMPLE_DT_MS  33
+#define G_TO_MS2      9.80665f
 
 static const char *TAG = "MQTT";
 
 static bool mqtt_connected = false;
 esp_mqtt_client_handle_t mqtt_client_global = NULL;
-char topic[32] = {0}; // topic mac/imu-live
 
-void get_mqtt_topic(char *topic_buf, size_t buf_len)
-{
-    char mac_str[13];                                     // 12 + null terminator
-    get_device_id(mac_str, sizeof(mac_str));              // Obtiene el ID del dispositivo
-    snprintf(topic_buf, buf_len, "%s/imu-live", mac_str); // Formatea el tópico como "mac/imu-live"
-    ESP_LOGI(TAG, "Tópico MQTT generado: %s", topic_buf); // Log del tópico generado
-}
 
-void mqtt_publish_last_sample(esp_mqtt_client_handle_t client, char *topic, volatile data_imu_t *sample)
-{
-    if (!client || !sample || !topic)
-    {
-        ESP_LOGE(TAG, "Parámetro inválido para publicación MQTT");
-        return;
-    }
-
-    if (!mqtt_connected)
-    {
-        ESP_LOGW(TAG, "MQTT desconectado, no se publica en topic=%s", topic);
-        return;
-    }
-
-    cJSON *json = cJSON_CreateObject();
-    if (!json)
-    {
-        ESP_LOGE(TAG, "Error al crear objeto JSON");
-        return;
-    }
-
-    cJSON_AddNumberToObject(json, "accX", sample->accX);
-    cJSON_AddNumberToObject(json, "accY", sample->accY);
-    cJSON_AddNumberToObject(json, "accZ", sample->accZ);
-    cJSON_AddNumberToObject(json, "gyroX", sample->gyroX);
-    cJSON_AddNumberToObject(json, "gyroY", sample->gyroY);
-    cJSON_AddNumberToObject(json, "gyroZ", sample->gyroZ);
-    cJSON_AddNumberToObject(json, "inclX", sample->inclX);
-    cJSON_AddNumberToObject(json, "inclY", sample->inclY);
-
-    char *json_str = cJSON_PrintUnformatted(json);
-    cJSON_Delete(json);
-
-    if (!json_str)
-    {
-        ESP_LOGE(TAG, "Error al generar string JSON");
-        return;
-    }
-
-    int msg_id = esp_mqtt_client_publish(client, topic, json_str, strlen(json_str), 0, 0);
-
-    /*  if (msg_id >= 0)
-     {
-         ESP_LOGI(TAG, "Publicación MQTT exitosa: topic=%s, msg_id=%d", topic, msg_id);
-     }
-     else
-     {
-         ESP_LOGE(TAG, "Error al publicar en MQTT (msg_id=%d)", msg_id);
-     } */
-
-    free(json_str);
-}
 
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
@@ -110,7 +54,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 
 void mqtt_app_start(struct device *dev)
 {
-    get_mqtt_topic(topic, sizeof(topic));
+    
 
         esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = MQTT_BROKER,
@@ -139,17 +83,69 @@ void mqtt_app_start(struct device *dev)
     ESP_LOGI(TAG, "Cliente MQTT iniciado");
 }
 
+#define APPEND_ARRAY(NAME, EXPR)                                              \
+    do {                                                                      \
+        len += snprintf(payload + len, sizeof(payload) - len,                 \
+                        ",\"" NAME "\":[");                                   \
+        for (int i = 0; i < BATCH_N; i++) {                                   \
+            len += snprintf(payload + len, sizeof(payload) - len,             \
+                            (i ? ",%.3f" : "%.3f"), (double)(EXPR));          \
+        }                                                                     \
+        len += snprintf(payload + len, sizeof(payload) - len, "]");           \
+    } while (0)
+
+static void mqtt_publish_batch(const data_imu_t *batch, uint32_t t0_ms)
+{
+    static char payload[2048];
+    int len = 0;
+
+    len += snprintf(payload + len, sizeof(payload) - len,
+                    "{\"t0\":%lu,\"dt\":%u,\"n\":%u",
+                    (unsigned long)t0_ms,
+                    (unsigned)SAMPLE_DT_MS,
+                    (unsigned)BATCH_N);
+
+    APPEND_ARRAY("ax", batch[i].accX * G_TO_MS2);
+    APPEND_ARRAY("ay", batch[i].accY * G_TO_MS2);
+    APPEND_ARRAY("az", batch[i].accZ * G_TO_MS2);
+    APPEND_ARRAY("gx", batch[i].gyroX);
+    APPEND_ARRAY("gy", batch[i].gyroY);
+    APPEND_ARRAY("gz", batch[i].gyroZ);
+    APPEND_ARRAY("ix", batch[i].inclX);
+    APPEND_ARRAY("iy", batch[i].inclY);
+
+    len += snprintf(payload + len, sizeof(payload) - len, "}");
+
+    esp_mqtt_client_publish(mqtt_client_global, MQTT_TELEMETRY_TOPIC,
+                            payload, len, 0, 0);
+}
+
 // Tarea para publicar datos en vivo sin bloquear la recolección
+
 void mqtt_live_task(void *arg)
 {
+    static data_imu_t batch[BATCH_N];
+    int count = 0;
+    uint32_t t0_ms = 0;
     data_imu_t sample;
 
     while (1)
     {
         if (xQueueReceive(mqtt_live_queue, &sample, portMAX_DELAY))
         {
-            // Publica sin bloquear la recolección
-            mqtt_publish_last_sample(mqtt_client_global, topic, &sample);
+            if (count == 0) {
+                t0_ms = (uint32_t)(esp_timer_get_time() / 1000);
+            }
+            batch[count++] = sample;
+
+            if (count >= BATCH_N) {
+                if (mqtt_connected) {
+                    mqtt_publish_batch(batch, t0_ms);
+                }
+                count = 0;
+            }
         }
     }
 }
+
+

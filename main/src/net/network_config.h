@@ -13,7 +13,7 @@
 #define MQTT_BROKER   "mqtts://x1dc1a12.ala.us-east-1.emqxsl.com"
 #define MQTT_PORT     8883
 #define MQTT_USERNAME "R2MyClient"
-#define MQTT_PASSWORD "TU_CONTRASEÑA_VIGENTE"
+#define MQTT_PASSWORD "AmeliaJuan"
 #define MQTT_TELEMETRY_TOPIC "imu/esp32/rs20003BELO/telemetry"
 
 // ---------------------------------------------------------

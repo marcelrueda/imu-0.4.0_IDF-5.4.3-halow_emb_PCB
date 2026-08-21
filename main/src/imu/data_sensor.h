@@ -9,9 +9,6 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 
-#define JSON_BUFFER_SIZE 32768 // 32 KB
-//#define GZIP_BUFFER_SIZE 65536 // 64 KB (para datos comprimidos)
-//#define GZIP_BUFFER_SIZE (256 * 1024)
 // Estructura para almacenar una muestra de datos del sensor
 typedef struct
 {
@@ -44,21 +41,12 @@ typedef struct
 extern volatile sample_status_t sample_status;
 
 // Variables globales accesibles
-extern QueueHandle_t signal_queue;
-extern TaskHandle_t gzip_task_handle;
 extern QueueHandle_t signal_queue_task;
 extern QueueHandle_t signal_queue_state;
 extern QueueHandle_t mqtt_live_queue;
-extern QueueHandle_t compression_signal_queue;
 extern QueueHandle_t collection_signal_queue;
 
 // Prototipos de funciones
 void data_collection_task(void *arg);
-void data_compression_task(void *arg);
 
-size_t get_gzip_data_size();      // Obtiene el tamaño del último dato GZIP generado
-size_t generate_json_gzip_data(); // Genera datos JSON y los comprime con GZIP
-uint8_t *get_gzip_data_buffer();  // Obtiene el buffer de datos comprimidos
-
-void sensor_memory_init(); // Inicializa memoria para buffers en PSRAM
 #endif

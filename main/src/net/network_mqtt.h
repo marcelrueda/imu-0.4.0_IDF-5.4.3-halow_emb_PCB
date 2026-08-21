@@ -28,8 +28,7 @@ extern esp_mqtt_client_handle_t mqtt_client_global;
 // Inicializa el cliente MQTT
 void mqtt_app_start(struct device *dev);
 
-// Publica la última muestra del sensor
-void mqtt_publish_last_sample(esp_mqtt_client_handle_t client, char *topic, volatile data_imu_t *sample);
+
 
 // Tarea para publicar datos en vivo sin bloquear la recolección
 void mqtt_live_task(void *arg);

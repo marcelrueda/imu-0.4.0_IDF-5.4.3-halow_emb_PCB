@@ -16,7 +16,6 @@ set(srcs
     "src/imu/imu.c"
     # NETWORK
     "src/net/network_halow_mm.c"
-    "src/net/network_http_client.c"
     "src/net/network_mqtt.c"
     "src/net/network_selector.c"
     "src/net/network_tcp_client.c"

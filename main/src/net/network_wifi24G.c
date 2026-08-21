@@ -10,12 +10,12 @@
 //    #define WIFI_PASS "apache123"
 
 // WIFI Eleinco
-#define EXAMPLE_ESP_WIFI_SSID "Corporativo"
-#define EXAMPLE_ESP_WIFI_PASS "aabbccddee"
+//#define EXAMPLE_ESP_WIFI_SSID "Corporativo"
+//#define EXAMPLE_ESP_WIFI_PASS "aabbccddee"
 
 // WIFI Marcel
-// #define EXAMPLE_ESP_WIFI_SSID "Spitfire4"
-// #define EXAMPLE_ESP_WIFI_PASS "Sputnik4"
+#define EXAMPLE_ESP_WIFI_SSID "Spitfire4"
+#define EXAMPLE_ESP_WIFI_PASS "Sputnik4"
 #define EXAMPLE_ESP_MAXIMUM_RETRY 10
 
 /* FreeRTOS event group to signal when we are connected*/
