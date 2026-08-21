@@ -1,0 +1,29 @@
+# ============================================================
+# IDF Component Manifest
+# ============================================================
+version: "0.1.0"
+
+description: "Componente principal para proyecto HaLow basado en mm-iot-esp32"
+license: "Proprietary"
+
+maintainers:
+  - "Carlos Andres Vargas Calderon"
+
+targets:
+  - esp32s3
+  
+dependencies:
+  # =========================
+  # Core Framework (mm-iot)
+  # =========================
+  mmutils:
+    path: $MMIOT_ROOT/framework/src/mmutils # Utilidades base (helpers, logging, wrappers comunes)
+  morselib:
+    path: $MMIOT_ROOT/framework/morselib # Librería principal de Morse Micro (stack HaLow, drivers)
+  mm_shims:
+    path: $MMIOT_ROOT/framework/mm_shims # Shims / adaptadores entre ESP-IDF y el framework mm-iot
+  mmipal:
+    path: $MMIOT_ROOT/framework/src/mmipal # IP Abstraction Layer (capa de red / integración TCP-IP)
+  mmiperf:
+    path: $MMIOT_ROOT/framework/src/mmiperf # Herramienta tipo iperf para pruebas de rendimiento
+

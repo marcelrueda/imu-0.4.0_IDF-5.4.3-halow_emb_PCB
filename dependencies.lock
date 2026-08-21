@@ -1,0 +1,99 @@
+dependencies:
+  idf:
+    source:
+      type: idf
+    version: 5.4.4
+  mm_shims:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmutils
+      path: ../src/mmutils
+      version: ==2.9.7-esp32
+    source:
+      path: C:\Users\User\Desktop\IMU-main\IMU-main\2026\IMU 2026-R1.0\Code\imu 0.4.0_IDF 5.4.3 halow_emb_PCB\components\mm-iot-esp32\framework\mm_shims
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmipal:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmutils
+      path: ../mmutils
+      version: ==2.9.7-esp32
+    source:
+      path: C:\Users\User\Desktop\IMU-main\IMU-main\2026\IMU 2026-R1.0\Code\imu 0.4.0_IDF 5.4.3 halow_emb_PCB\components\mm-iot-esp32\framework\src\mmipal
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmiperf:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmipal
+      path: ../mmipal
+      version: ==2.9.7-esp32
+    source:
+      path: C:\Users\User\Desktop\IMU-main\IMU-main\2026\IMU 2026-R1.0\Code\imu 0.4.0_IDF 5.4.3 halow_emb_PCB\components\mm-iot-esp32\framework\src\mmiperf
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmpktmem:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    source:
+      path: C:\Users\User\Desktop\IMU-main\IMU-main\2026\IMU 2026-R1.0\Code\imu 0.4.0_IDF 5.4.3 halow_emb_PCB\components\mm-iot-esp32\framework\src\mmpktmem
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmutils:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    source:
+      path: C:\Users\User\Desktop\IMU-main\IMU-main\2026\IMU 2026-R1.0\Code\imu 0.4.0_IDF 5.4.3 halow_emb_PCB\components\mm-iot-esp32\framework\src\mmutils
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  morselib:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmpktmem
+      path: ../src/mmpktmem
+      version: ==2.9.7-esp32
+    source:
+      path: C:\Users\User\Desktop\IMU-main\IMU-main\2026\IMU 2026-R1.0\Code\imu 0.4.0_IDF 5.4.3 halow_emb_PCB\components\mm-iot-esp32\framework\morselib
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+direct_dependencies:
+- idf
+- mm_shims
+- mmipal
+- mmiperf
+- mmutils
+- morselib
+manifest_hash: ac465fb05a91747eed71e42d15c098691cb307569157863529dd8579b8075b2a
+target: esp32s3
+version: 2.0.0

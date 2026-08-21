@@ -1,0 +1,145 @@
+I²C   BUS
+SCL    2    GPIO18 --------> SCL
+SDA    3    GPIO17 <-------> SDA
+
+ Dispositivo detectado en 0x36   (max17043)
+ Dispositivo detectado en 0x3C  (Display)
+
+
+
+**************************************************************************
+HaLow    SPI2
+-------------------------                    
+SPI_CLK     SDIO_CLK                    12       
+SPI_MOSI    SDIO_CMD                    11        
+SPI_MISO    SDIO_D0                     13      
+SPI_CS      SDIO_D3                     10  
+
+GPIO        SDIO_D1    >> SPI_INT       6  
+GPIO        MM_WAKE                     8
+GPIO        MM_RESET_N                  7
+GPIO        MM_BUSY                     9
+
+**************************************************************************
+IMU SPI3
+-------------------------
+SPI_CLK     CLK                        40       
+SPI_MOSI    MOSI                       41        
+SPI_MISO    MISO                       42      
+SPI_CS1     SCA3300_CSB                39   
+SPI_CS2     CL3400_CSB                 38
+SPI_CS3     ICM42670P_CS               21
+SPI_CS4     LIS3MDLTR_CS               5
+SPI_CS5     SD_CS                      4
+**************************************************************************
+MISC  (IO general)
+-------------------------
+SW1                                    EN
+SW2  (boot)                            0
+BTN                                    18
+LEDG (run)                             14
+SD_DET                                 48
+LTC2954_KILL                           16
+LTC2954_INT                            17
+
+
+
+
+
+root
+heltec.org
+
+HLWROUTER_02 
+HLW12302*+
+
+
+
+                                        Shield ESP32-S3 N16R8 
+                                   __________________________________
+                                  |                                  |
+                             GND  |                             SCL0 |GPIO0  Reloj/Display(I2C0_SCL0)
+ Reloj/Display (I2C0_SDA0)   GPIO1| ADC1_0/SDA0                      |EN  
+           IMU (I2C1_SCL1)   GPIO2| ADC1_1/SCL1                      |GPIO46   
+           IMU (I2C1_SDA1)   GPIO3| ADC1_2/SDA1                      |GPIO45
+                             GPIO4| ADC1_3                    U0_RXD |GPIO44 ------
+                             GPIO5| ADC1_4                    U0_TXD |GPIO43 ------
+          HaLow(SPI2_INT)    GPIO6| ADC1_5                           |GPIO42 IMU(SPI3_MISO)
+          HaLow(RESET)       GPIO7| ADC1_6                           |GPIO41 IMU(SPI3_MOSI)
+          HaLow(WAKE)        GPIO8| ADC1_7/SPIC1                     |GPIO40 IMU(SPI3_CLK)
+          HaLow(BUSY)        GPIO9| ADC1_8/SPI2HD              SPICS1|GPIO39                       error usando como CS
+          HaLow(SPI2_CS)    GPIO10| ADC1_9/SPI2CS0             SPIWP |GPIO38 IMU(SPI3_CS)   
+          HaLow(SPI2_MOSI)  GPIO11| ADC2_0/SPI2D               SPIO  |GPIO37
+          HaLow(SPI2_CLK)   GPIO12| ADC2_1/SPI2CLK             SPICLK|GPIO36 
+          HaLow(SPI2_MISO)  GPIO13| ADC2_2/SPI2Q               SPID  |GPIO35
+                            GPIO14| ADC2_3/SPIWP                     |GPIO47
+                            GPIO15| ADC2_4                           |GPIO48
+                            GPIO16| ADC2_5                           |3.3V
+                            GPIO17| ADC2_6/U1_TX                     | 5V
+                            GPIO18| ADC2_7/U1_RX                     | GND
+                                  |__________________________________| 
+
+
+
+
+
+
+#define SCL3400_PIN_CLK 36   // SPI3CLK
+#define SCL3400_PIN_MOSI 35  // SPI3D
+#define SCL3400_PIN_MISO 37  // SPI3Q
+#define SCL3400_PIN_CS 38    // (o cualquier otro GPIO libre: 10–33, 45–48)
+
+🌀 SPI (puede elegir cualquiera de los buses disponibles):
+SPI2 (HSPI): GPIO36 (CLK), GPIO35 (MOSI), GPIO42 (MISO), GPIO38 (CS)
+SPI3 (VSPI): puedes usar: GPIO40 (CLK), GPIO41 (MOSI), GPIO42 (MISO), GPIO37 (CS)
+
+🔍 UART:
+UART0 (consola): GPIO44 (RX), GPIO43 (TX)
+UART1 (libre): GPIO17 (TX), GPIO18 (RX)
+
+🎯 ADC:
+ADC1: GPIO01 ~ GPIO10
+ADC2: GPIO11 ~ GPIO18
+⚠️ Los pines GPIO46~48 no tienen ADC
+
+🎧 DAC:
+DAC1 → GPIO11
+DAC2 → GPIO15
+
+📶 PWM:
+Todos los GPIOs con salida digital (sin restricción de funciones) soportan PWM (LEDC).
+
+
+
+Libres
+1,2,3,4,5,14,15,16,46,45,47,48
+
+
+ESP32             SCL3400      (SPI2 – VSPI)
+-----             -------
+
+
+
+
+
+
+set(srcs "main.c"
+                "data_sensor.c"
+                "device_mpu6500.c"    
+                "device_mpu6500.c"
+                "i2c_bus.c"
+                "server_http.c"
+                "network_halow_mm.c"
+                "network_tcp_client.c"
+                "network_http_client.c"
+                "time_ntp.c"
+      
+         )
+idf_component_register(SRCS ${srcs}
+                    INCLUDE_DIRS "."
+                    EMBED_TXTFILES cert/server_root_cert.pem   # Certificate for TLS gmail
+                    esp_logo.png)                              # Logo 
+
+
+
+
+

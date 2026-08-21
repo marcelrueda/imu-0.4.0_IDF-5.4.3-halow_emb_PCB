@@ -1,0 +1,12 @@
+{
+  "idf.currentSetup": "C:\\esp\\v5.4.4\\esp-idf",
+  "idf.flashType": "UART",
+  "idf.portWin": "COM5",
+  "idf.customExtraVars": {},
+  "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=d:\\Repositorio\\Trabajos\\Halow MR01\\2026\\IMU 2026-R1.0\\Code\\imu 0.4.0_IDF 5.4.3 halow_emb\\build"
+  ]
+}
